@@ -65,7 +65,7 @@ const AboutSection = () => {
         >
           {/* Left Side with Text and Button */}
           <div className="lg:w-1/2 mb-12 lg:mb-0 lg:pr-12">
-            <h2 className="text-5xl font-bold text-center lg:text-left mb-8 bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-pink-500">About Me</h2>
+            <h2 className="text-5xl font-bold text-center lg:text-left mb-8 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-pink-500">About Me</h2>
             <p className="text-xl text-center lg:text-left mb-8 leading-relaxed">
               I'm Mukadaz Taofeeq, a passionate Fullstack Developer on a mission to transform ideas into digital reality. With a robust toolkit spanning frontend and backend technologies, I craft innovative solutions that push the boundaries of web development.
             </p>
@@ -74,8 +74,8 @@ const AboutSection = () => {
             </p>
             <div className="text-center lg:text-left">
               <motion.a
-                href="#contact"
-                className="inline-block bg-gradient-to-r from-pink-500 to-yellow-500 text-white font-bold py-4 px-10 rounded-full text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                href="https://www.linkedin.com/in/mukadaz-taofeeq?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
+                className="inline-block bg-gradient-to-r from-pink-500 to-blue-500 text-white font-bold py-4 px-10 rounded-full text-lg shadow-lg hover:shadow-xl transition-all duration-300"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >

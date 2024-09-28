@@ -11,73 +11,77 @@ const HeroSection = () => {
     const ctx = canvas.getContext('2d');
     let animationFrameId;
 
-    // Set canvas size
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    // Star properties
-    const stars = [];
-    const numStars = 200;
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
+    const particles = [];
+    const particleCount = 100;
 
-    // Create stars
-    for (let i = 0; i < numStars; i++) {
-      stars.push({
+    for (let i = 0; i < particleCount; i++) {
+      particles.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        radius: Math.random() * 1.5,
-        vx: (Math.random() - 0.5) * 0.1,
-        vy: (Math.random() - 0.5) * 0.1
+        radius: Math.random() * 2 + 1,
+        color: `hsl(${Math.random() * 60 + 180}, 100%, 50%)`,
+        velocity: {
+          x: (Math.random() - 0.5) * 2,
+          y: (Math.random() - 0.5) * 2
+        }
       });
     }
 
-    const animate = () => {
+    const drawParticles = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Update and draw stars
-      stars.forEach(star => {
-        star.x += star.vx;
-        star.y += star.vy;
+      particles.forEach((particle, index) => {
+        particle.x += particle.velocity.x;
+        particle.y += particle.velocity.y;
 
-        // Wrap around canvas
-        if (star.x < 0 || star.x > canvas.width) star.vx = -star.vx;
-        if (star.y < 0 || star.y > canvas.height) star.vy = -star.vy;
+        if (particle.x < 0 || particle.x > canvas.width) particle.velocity.x *= -1;
+        if (particle.y < 0 || particle.y > canvas.height) particle.velocity.y *= -1;
 
-        // Draw star
         ctx.beginPath();
-        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-        ctx.fillStyle = '#ffffff';
+        ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+        ctx.fillStyle = particle.color;
         ctx.fill();
 
-        // Connect nearby stars
-        stars.forEach(otherStar => {
-          const distance = Math.sqrt(
-            Math.pow(star.x - otherStar.x, 2) + Math.pow(star.y - otherStar.y, 2)
-          );
-          if (distance < 50) {
+        particles.slice(index + 1).forEach(otherParticle => {
+          const dx = particle.x - otherParticle.x;
+          const dy = particle.y - otherParticle.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance < 100) {
             ctx.beginPath();
-            ctx.moveTo(star.x, star.y);
-            ctx.lineTo(otherStar.x, otherStar.y);
-            ctx.strokeStyle = `rgba(255, 255, 255, ${1 - distance / 50})`;
+            ctx.strokeStyle = `rgba(255, 255, 255, ${1 - distance / 100})`;
+            ctx.lineWidth = 0.5;
+            ctx.moveTo(particle.x, particle.y);
+            ctx.lineTo(otherParticle.x, otherParticle.y);
             ctx.stroke();
           }
         });
       });
 
-      animationFrameId = requestAnimationFrame(animate);
+      animationFrameId = requestAnimationFrame(drawParticles);
     };
 
-    animate();
+    drawParticles();
+
+    const handleResize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+
+    window.addEventListener('resize', handleResize);
 
     return () => {
       cancelAnimationFrame(animationFrameId);
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
   return (
     <div className="hero-container">
-      <canvas ref={canvasRef} className="star-background"></canvas>
+      <canvas ref={canvasRef} className="particle-background"></canvas>
 
       <div className="content">
         <motion.h1
@@ -85,7 +89,7 @@ const HeroSection = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
-          <b>Taofeeq Mukadaz</b> {/* Make the name bolder */}
+          <span className="name">Taofeeq Mukadaz</span>
         </motion.h1>
         <motion.div
           className="typewriter"
@@ -120,7 +124,7 @@ const HeroSection = () => {
           transition={{ duration: 0.8, delay: 1.6 }}
         >
           <motion.a
-            href="/MukadazT.pdf"
+            href="/mukadazlabs.pdf"
             className="cta-primary"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -165,42 +169,22 @@ const HeroSection = () => {
         </div>
       </div>
       <style jsx>{`
-        /* CSS styles here */
         .hero-container {
           position: relative;
           height: 100vh;
           width: 100%;
           overflow: hidden;
-          background: linear-gradient(135deg, #1e1e2f 0%, #2a2a4a 100%);
+          background: linear-gradient(135deg, #0f0f1f 0%, #1a1a3a 100%);
           color: #ffffff;
           font-family: 'Arial', sans-serif;
         }
 
-        .star-background {
+        .particle-background {
           position: absolute;
           top: 0;
           left: 0;
           width: 100%;
           height: 100%;
-        }
-
-        .navbar {
-          position: absolute;
-          top: 20px;
-          right: 40px;
-          display: flex;
-          gap: 20px;
-        }
-
-        .navbar a {
-          color: #ffffff;
-          text-decoration: none;
-          font-size: 18px;
-          transition: color 0.3s ease;
-        }
-
-        .navbar a:hover {
-          color: #ffd700;
         }
 
         .content {
@@ -216,23 +200,28 @@ const HeroSection = () => {
         }
 
         h1 {
-          font-size: 4rem;
+          font-size: 4.5rem;
           margin-bottom: 20px;
-          background: linear-gradient(45deg, #ffd700, #ff69b4);
+          font-weight: bold;
+        }
+
+        .name {
+          background: linear-gradient(45deg, #00ffff, #ff00ff);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
-          font-weight: bold; /* Make the name bolder */
+          text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
         }
 
         .typewriter {
-          font-size: 1.5rem;
+          font-size: 1.8rem;
           margin-bottom: 20px;
+          color: #f0f0f0;
         }
 
         .subtitle {
-          font-size: 1.2rem;
+          font-size: 1.4rem;
           margin-bottom: 40px;
-          color: #b0b0b0;
+          color: #d0d0d0;
         }
 
         .cta-buttons {
@@ -242,44 +231,66 @@ const HeroSection = () => {
         }
 
         .cta-primary, .cta-secondary {
-          padding: 12px 24px;
+          padding: 14px 28px;
           border-radius: 30px;
-          font-size: 1rem;
+          font-size: 1.1rem;
           font-weight: bold;
           text-decoration: none;
           transition: all 0.3s ease;
+          text-transform: uppercase;
+          letter-spacing: 1px;
         }
 
         .cta-primary {
-          background: linear-gradient(45deg, #ffd700, #ff69b4);
-          color: #1e1e2f;
+          background: linear-gradient(45deg, #00ffff, #ff00ff);
+          color: #0f0f1f;
+          box-shadow: 0 4px 15px rgba(0, 255, 255, 0.4);
         }
 
         .cta-secondary {
           background: transparent;
           color: #ffffff;
           border: 2px solid #ffffff;
+          box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
         }
 
         .social-links {
           display: flex;
-          gap: 20px;
+          gap: 25px;
         }
 
         .social-links a {
           color: #ffffff;
-          font-size: 24px;
-          transition: color 0.3s ease;
+          font-size: 28px;
+          transition: all 0.3s ease;
         }
 
         .social-links a:hover {
-          color: #ffd700;
+          color: #00ffff;
+          transform: translateY(-5px);
         }
 
-        /* Media queries for responsiveness */
         @media (max-width: 768px) {
           h1 {
-            font-size: 3rem;
+            font-size: 3.5rem;
+          }
+
+          .typewriter {
+            font-size: 1.4rem;
+          }
+
+          .subtitle {
+            font-size: 1.2rem;
+          }
+
+          .cta-buttons {
+            flex-direction: column;
+          }
+        }
+
+        @media (max-width: 480px) {
+          h1 {
+            font-size: 2.8rem;
           }
 
           .typewriter {
@@ -290,43 +301,13 @@ const HeroSection = () => {
             font-size: 1rem;
           }
 
-          .cta-buttons {
-            flex-direction: column;
-          }
-
-          .navbar {
-            top: 10px;
-            right: 20px;
-          }
-
-          .navbar a {
-            font-size: 16px;
-          }
-        }
-
-        @media (max-width: 480px) {
-          h1 {
-            font-size: 2.5rem;
-          }
-
-          .typewriter {
+          .cta-primary, .cta-secondary {
+            padding: 12px 24px;
             font-size: 1rem;
           }
 
-          .subtitle {
-            font-size: 0.9rem;
-          }
-
-          .cta-buttons {
-            gap: 10px;
-          }
-
-          .cta-primary, .cta-secondary {
-            padding: 10px 20px;
-          }
-
           .social-links a {
-            font-size: 20px;
+            font-size: 24px;
           }
         }
       `}</style>
