@@ -32,7 +32,7 @@
     "typewriter-effect": "^2.21.0"
   },
   
-  optionalDependencies": {
+  "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "4.6.1"
   },
   
